@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n/provider';
 import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { AppText as Text } from '@/components/app-text';
@@ -7,6 +8,7 @@ import { prayerNames } from '@/data/prayer-times';
 import { getPrayerState } from '@/utils/prayer-time';
 
 export default function SalatTimerScreen() {
+  const { t, locale } = useI18n();
   const { colors, cornerRadius, location } = useAppPreferences();
   const styles = useMemo(() => createStyles(colors, cornerRadius), [colors, cornerRadius]);
   const [now, setNow] = useState(() => new Date());
@@ -15,23 +17,23 @@ export default function SalatTimerScreen() {
     return () => clearInterval(timer);
   }, []);
   const prayer = getPrayerState(now, location);
-  const date = new Intl.DateTimeFormat('en-GB', { timeZone: location.timezone, weekday: 'long', day: 'numeric', month: 'long' }).format(now);
+  const date = new Intl.DateTimeFormat(locale, { timeZone: location.timezone, weekday: 'long', day: 'numeric', month: 'long' }).format(now);
   return (
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.locationLine}>
             <View style={styles.locationDot} />
-            <Text style={styles.location}>{location.city}, {location.country}</Text>
+            <Text style={styles.location}>{t('location.format', { city: t(location.cityKey), country: t(location.countryKey) })}</Text>
           </View>
           <View style={styles.countdownSection}>
-            <Text style={styles.nextPrayer}>{prayer.nextName} is next</Text>
-            <Text numberOfLines={1} adjustsFontSizeToFit accessibilityLabel={`${prayer.countdown} until ${prayer.nextName}`} style={styles.countdown}>{prayer.countdown}</Text>
-            <Text style={styles.until}>until {prayer.tomorrow ? 'tomorrow at ' : ''}{location.times[prayer.nextIndex]}</Text>
+            <Text style={styles.nextPrayer}>{t('prayer.next', { prayer: t(`prayer.${prayer.nextName}`) })}</Text>
+            <Text numberOfLines={1} adjustsFontSizeToFit accessibilityLabel={t('prayer.countdownLabel', { countdown: prayer.countdown, prayer: t(`prayer.${prayer.nextName}`) })} style={styles.countdown}>{prayer.countdown}</Text>
+            <Text style={styles.until}>{t(prayer.tomorrow ? 'prayer.untilTomorrow' : 'prayer.until', { time: location.times[prayer.nextIndex] })}</Text>
             <View style={styles.dividerDetail}><View style={styles.detailLine} /><View style={styles.detailDiamond} /><View style={styles.detailLine} /></View>
-            <Text style={styles.reflection}>A moment to pause. A time to reconnect.</Text>
+            <Text style={styles.reflection}>{t('prayer.reflection')}</Text>
           </View>
           <View style={styles.scheduleHeader}>
-            <Text accessibilityRole="header" style={styles.sectionTitle}>Today’s prayers</Text>
-            <Text style={styles.today}>Today</Text>
+            <Text accessibilityRole="header" style={styles.sectionTitle}>{t('prayer.todayTitle')}</Text>
+            <Text style={styles.today}>{t('prayer.today')}</Text>
           </View>
           <Text style={styles.date}>{date}</Text>
           <View style={styles.schedule}>
@@ -41,16 +43,16 @@ export default function SalatTimerScreen() {
               return (
                 <View key={name} style={[styles.prayerRow, next && styles.nextRow]}>
                   <View style={styles.prayerLabel}>
-                    <Text style={[styles.prayerName, passed && styles.pastText, next && styles.nextText]}>{name}</Text>
-                    {next && <Text style={styles.nextBadge}>Next</Text>}
+                    <Text style={[styles.prayerName, passed && styles.pastText, next && styles.nextText]}>{t(`prayer.${name}`)}</Text>
+                    {next && <Text style={styles.nextBadge}>{t('prayer.nextBadge')}</Text>}
                   </View>
                   <Text style={[styles.prayerTime, passed && styles.pastText, next && styles.nextText]}>{location.times[index]}</Text>
                 </View>
               );
             })}
           </View>
-          <Text style={styles.sampleNote}>Sample prayer times · Preview only</Text>
-          <Text style={styles.footer}>Your day, centred around prayer.</Text>
+          <Text style={styles.sampleNote}>{t('prayer.sample')}</Text>
+          <Text style={styles.footer}>{t('prayer.footer')}</Text>
         </ScrollView>
   );
 }

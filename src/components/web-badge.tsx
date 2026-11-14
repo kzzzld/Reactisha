@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n/provider';
 import { version } from 'expo/package.json';
 import { Image } from 'expo-image';
 import { useColorScheme, StyleSheet } from 'react-native';
@@ -8,12 +9,13 @@ import { ThemedView } from './themed-view';
 import { Spacing } from '@/constants/theme';
 
 export function WebBadge() {
+  const { t } = useI18n();
   const scheme = useColorScheme();
 
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="code" themeColor="textSecondary" style={styles.versionText}>
-        v{version}
+        {t('starter.version', { version })}
       </ThemedText>
       <Image
         source={

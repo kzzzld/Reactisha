@@ -1,3 +1,5 @@
+import { availableLanguages } from '@/i18n/translate';
+import { useI18n } from '@/i18n/provider';
 import { useFonts } from 'expo-font';
 import { useMemo, useState, type ReactNode } from 'react';
 import {
@@ -17,6 +19,7 @@ const DEFAULT_CORNER_RADIUS = 12;
 const MAX_CORNER_RADIUS = 40;
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const { t, language, setLanguage } = useI18n();
   const [ayahSource, setAyahSource] = useState<AyahSource>(ayahSources[0]);
   const [sourcePickerOpen, setSourcePickerOpen] = useState(false);
   const [fontsLoaded, fontError] = useFonts(bundledFonts);
@@ -49,7 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const results = locations.filter((item) => `${item.city} ${item.country}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
+  const results = locations.filter((item) => `${item.city} ${item.country} ${t(item.cityKey)} ${t(item.countryKey)}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
 
   return (
     <AppPreferencesContext.Provider value={{ colors, cornerRadius, location, ayahSource }}>
@@ -58,8 +61,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <StatusBar barStyle={colors.dark ? "light-content" : "dark-content"} />
       <View style={styles.shell}>
         <View style={styles.header}>
-          <Text accessibilityRole="header" style={styles.brand}>Salat Timer</Text>
-          <Pressable accessibilityRole="button" accessibilityLabel="Open menu" accessibilityState={{ expanded: menuOpen }} onPress={() => setMenuOpen(true)} style={({ pressed }) => [styles.menuButton, pressed && styles.pressed]}>
+          <Text accessibilityRole="header" style={styles.brand}>{t('app.name')}</Text>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('menu.open')} accessibilityState={{ expanded: menuOpen }} onPress={() => setMenuOpen(true)} style={({ pressed }) => [styles.menuButton, pressed && styles.pressed]}>
             <View style={styles.dots}>{[0, 1, 2].map((dot) => <View key={dot} style={styles.dot} />)}</View>
           </Pressable>
         </View>
@@ -67,27 +70,27 @@ export function AppShell({ children }: { children: ReactNode }) {
       </View>
 
       <Modal visible={menuOpen} transparent animationType="fade" onRequestClose={() => setMenuOpen(false)}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Close menu" style={styles.menuBackdrop} onPress={() => setMenuOpen(false)}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('menu.close')} style={styles.menuBackdrop} onPress={() => setMenuOpen(false)}>
           <SafeAreaView style={styles.menuSafeArea}>
             <View style={styles.menuPanel}>
               <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setQuery(''); setPickerOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
-                <Text style={styles.menuItemText}>Choose location</Text>
+                <Text style={styles.menuItemText}>{t('menu.location')}</Text>
               </Pressable>
               <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setThemePickerOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
-                <Text style={styles.menuItemText}>Color scheme</Text>
-                <Text style={styles.country}>{colors.name}</Text>
+                <Text style={styles.menuItemText}>{t('menu.theme')}</Text>
+                <Text style={styles.country}>{t(colors.nameKey)}</Text>
               </Pressable>
               <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setFontPickerOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
-                <Text style={styles.menuItemText}>Font</Text>
-                <Text style={styles.country}>{font.name}</Text>
+                <Text style={styles.menuItemText}>{t('menu.font')}</Text>
+                <Text style={styles.country}>{t(font.nameKey)}</Text>
               </Pressable>
               <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setCornerInput(String(cornerRadius)); setSettingsOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
-                <Text style={styles.menuItemText}>Settings</Text>
-                <Text style={styles.country}>Corner rounding · {cornerRadius}</Text>
+                <Text style={styles.menuItemText}>{t('menu.settings')}</Text>
+                <Text style={styles.country}>{t('rounding.summary', { radius: cornerRadius })}</Text>
               </Pressable>
               <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setSourcePickerOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
-                <Text style={styles.menuItemText}>Ayah source</Text>
-                <Text style={styles.country}>{ayahSource.name}</Text>
+                <Text style={styles.menuItemText}>{t('menu.source')}</Text>
+                <Text style={styles.country}>{t(ayahSource.nameKey)}</Text>
               </Pressable>
             </View>
           </SafeAreaView>
@@ -98,15 +101,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.pickerShell}>
             <View style={styles.pickerHeader}>
-              <Text accessibilityRole="header" style={styles.sectionTitle}>Ayah source</Text>
-              <Pressable accessibilityRole="button" onPress={() => setSourcePickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>Done</Text></Pressable>
+              <Text accessibilityRole="header" style={styles.sectionTitle}>{t('menu.source')}</Text>
+              <Pressable accessibilityRole="button" onPress={() => setSourcePickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>{t('common.done')}</Text></Pressable>
             </View>
-            <Text style={styles.pickerHint}>Ayahs are fetched from your selected source. An internet connection is required.</Text>
+            <Text style={styles.pickerHint}>{t('source.hint')}</Text>
             <ScrollView contentContainerStyle={styles.themeList}>
               {ayahSources.map((source) => (
-                <Pressable key={source.id} accessibilityRole="radio" accessibilityLabel={source.name} accessibilityState={{ checked: ayahSource.id === source.id }} onPress={() => setAyahSource(source)} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
-                  <View style={styles.schemeCopy}><Text style={styles.cityName}>{source.name}</Text><Text style={styles.country}>{source.description}</Text></View>
-                  {ayahSource.id === source.id && <Text style={styles.selected}>Selected</Text>}
+                <Pressable key={source.id} accessibilityRole="radio" accessibilityLabel={t(source.nameKey)} accessibilityState={{ checked: ayahSource.id === source.id }} onPress={() => setAyahSource(source)} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
+                  <View style={styles.schemeCopy}><Text style={styles.cityName}>{t(source.nameKey)}</Text><Text style={styles.country}>{t(source.descriptionKey)}</Text></View>
+                  {ayahSource.id === source.id && <Text style={styles.selected}>{t('common.selected')}</Text>}
                 </Pressable>
               ))}
             </ScrollView>
@@ -118,15 +121,24 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.pickerShell}>
             <View style={styles.pickerHeader}>
-              <Text accessibilityRole="header" style={styles.sectionTitle}>Settings</Text>
-              <Pressable accessibilityRole="button" accessibilityState={{ disabled: !validCornerInput }} disabled={!validCornerInput} onPress={closeSettings} style={[styles.cancelButton, !validCornerInput && styles.pressed]}><Text style={styles.cancel}>Done</Text></Pressable>
+              <Text accessibilityRole="header" style={styles.sectionTitle}>{t('menu.settings')}</Text>
+              <Pressable accessibilityRole="button" accessibilityState={{ disabled: !validCornerInput }} disabled={!validCornerInput} onPress={closeSettings} style={[styles.cancelButton, !validCornerInput && styles.pressed]}><Text style={styles.cancel}>{t('common.done')}</Text></Pressable>
             </View>
             <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.settingsContent}>
-              <Text style={styles.cityName}>Corner rounding</Text>
-              <Text style={styles.pickerHint}>Use 0 for square corners, or a higher number for rounder corners. Changes preview instantly.</Text>
+              <Text style={styles.cityName}>{t('language.title')}</Text>
+              <Text style={styles.pickerHint}>{t('language.hint')}</Text>
+              {availableLanguages.map((option) => (
+                <Pressable key={option.code} accessibilityRole="radio" accessibilityLabel={option.name} accessibilityState={{ checked: language === option.code }} onPress={() => setLanguage(option.code)} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
+                  <Text style={styles.cityName}>{option.name}</Text>
+                  {language === option.code && <Text style={styles.selected}>{t('common.selected')}</Text>}
+                </Pressable>
+              ))}
+              <Text style={styles.languageNote}>{t('language.ayahNote')}</Text>
+              <Text style={styles.cityName}>{t('rounding.title')}</Text>
+              <Text style={styles.pickerHint}>{t('rounding.hint')}</Text>
               <TextInput
-                accessibilityLabel="Corner rounding"
-                accessibilityHint="Enter a number from 0 to 40. Zero makes corners square."
+                accessibilityLabel={t('rounding.title')}
+                accessibilityHint={t('rounding.accessibility', { max: MAX_CORNER_RADIUS })}
                 value={cornerInput}
                 onChangeText={updateCornerInput}
                 inputMode="decimal"
@@ -137,13 +149,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                 onSubmitEditing={() => { if (validCornerInput) closeSettings(); }}
                 style={[styles.search, { fontFamily }]}
               />
-              <Text accessibilityRole={validCornerInput ? undefined : 'alert'} style={styles.inputHint}>{validCornerInput ? '0–40 · Default: 12' : 'Enter a number from 0 to 40.'}</Text>
+              <Text accessibilityRole={validCornerInput ? undefined : 'alert'} style={styles.inputHint}>{validCornerInput ? t('rounding.range', { max: MAX_CORNER_RADIUS, default: DEFAULT_CORNER_RADIUS }) : t('rounding.error', { max: MAX_CORNER_RADIUS })}</Text>
               <View style={styles.cornerPreview}>
-                <Text style={styles.previewName}>Prayer time</Text>
+                <Text style={styles.previewName}>{t('rounding.preview')}</Text>
                 <Text style={styles.previewTime}>06:21</Text>
               </View>
               <Pressable accessibilityRole="button" onPress={() => { setCornerRadius(DEFAULT_CORNER_RADIUS); setCornerInput(String(DEFAULT_CORNER_RADIUS)); }} style={({ pressed }) => [styles.resetButton, pressed && styles.pressed]}>
-                <Text style={styles.cancel}>Reset to default</Text>
+                <Text style={styles.cancel}>{t('rounding.reset')}</Text>
               </Pressable>
             </ScrollView>
           </View>
@@ -154,22 +166,22 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.pickerShell}>
             <View style={styles.pickerHeader}>
-              <Text accessibilityRole="header" style={styles.sectionTitle}>Font</Text>
-              <Pressable accessibilityRole="button" onPress={() => setFontPickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>Done</Text></Pressable>
+              <Text accessibilityRole="header" style={styles.sectionTitle}>{t('menu.font')}</Text>
+              <Pressable accessibilityRole="button" onPress={() => setFontPickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>{t('common.done')}</Text></Pressable>
             </View>
-            <Text style={styles.pickerHint}>Choose a font. Preview it across the app instantly.</Text>
-            {!fontsLoaded && <Text accessibilityRole="alert" style={styles.pickerHint}>{fontError ? 'Custom fonts couldn’t load. System is still available. Reopen the app to try again.' : 'Loading bundled fonts…'}</Text>}
+            <Text style={styles.pickerHint}>{t('font.hint')}</Text>
+            {!fontsLoaded && <Text accessibilityRole="alert" style={styles.pickerHint}>{fontError ? t('font.error') : t('font.loading')}</Text>}
             <ScrollView contentContainerStyle={styles.themeList}>
               {fontOptions.map((option) => {
                 const disabled = option.id !== 'system' && !fontsLoaded;
                 return (
-                  <Pressable key={option.id} accessibilityRole="radio" accessibilityLabel={option.name} accessibilityState={{ checked: font.id === option.id, disabled }} disabled={disabled} onPress={() => setFont(option)} style={({ pressed }) => [styles.fontRow, (pressed || disabled) && styles.pressed]}>
+                  <Pressable key={option.id} accessibilityRole="radio" accessibilityLabel={t(option.nameKey)} accessibilityState={{ checked: font.id === option.id, disabled }} disabled={disabled} onPress={() => setFont(option)} style={({ pressed }) => [styles.fontRow, (pressed || disabled) && styles.pressed]}>
                     <View style={styles.schemeCopy}>
-                      <Text style={[styles.cityName, { fontFamily: disabled ? undefined : option.family }]}>{option.name}</Text>
-                      <Text style={styles.country}>{option.description}</Text>
-                      <Text style={[styles.fontPreview, { fontFamily: disabled ? undefined : option.family }]}>Fajr  06:21  ·  0123456789</Text>
+                      <Text style={[styles.cityName, { fontFamily: disabled ? undefined : option.family }]}>{t(option.nameKey)}</Text>
+                      <Text style={styles.country}>{t(option.descriptionKey)}</Text>
+                      <Text style={[styles.fontPreview, { fontFamily: disabled ? undefined : option.family }]}>{t('font.preview', { prayer: t('prayer.Fajr'), time: '06:21' })}</Text>
                     </View>
-                    {font.id === option.id && <Text style={styles.selected}>Selected</Text>}
+                    {font.id === option.id && <Text style={styles.selected}>{t('common.selected')}</Text>}
                   </Pressable>
                 );
               })}
@@ -182,18 +194,18 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.pickerShell}>
             <View style={styles.pickerHeader}>
-              <Text accessibilityRole="header" style={styles.sectionTitle}>Color scheme</Text>
-              <Pressable accessibilityRole="button" onPress={() => setThemePickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>Done</Text></Pressable>
+              <Text accessibilityRole="header" style={styles.sectionTitle}>{t('menu.theme')}</Text>
+              <Pressable accessibilityRole="button" onPress={() => setThemePickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>{t('common.done')}</Text></Pressable>
             </View>
-            <Text style={styles.pickerHint}>Make room for your kind of calm.</Text>
+            <Text style={styles.pickerHint}>{t('theme.hint')}</Text>
             <ScrollView contentContainerStyle={styles.themeList}>
               {colorSchemes.map((scheme) => (
-                <Pressable key={scheme.name} accessibilityRole="radio" accessibilityState={{ checked: colors.name === scheme.name }} accessibilityLabel={scheme.name} onPress={() => setColors(scheme)} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
+                <Pressable key={scheme.name} accessibilityRole="radio" accessibilityState={{ checked: colors.name === scheme.name }} accessibilityLabel={t(scheme.nameKey)} onPress={() => setColors(scheme)} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
                   <View style={styles.schemeInfo}>
                     <View style={[styles.swatch, { backgroundColor: scheme.background, borderColor: scheme.muted }]}><View style={[styles.swatchAccent, { backgroundColor: scheme.green }]} /></View>
-                    <View style={styles.schemeCopy}><Text style={styles.cityName}>{scheme.name}</Text><Text style={styles.country}>{scheme.description}</Text></View>
+                    <View style={styles.schemeCopy}><Text style={styles.cityName}>{t(scheme.nameKey)}</Text><Text style={styles.country}>{t(scheme.descriptionKey)}</Text></View>
                   </View>
-                  {colors.name === scheme.name && <Text style={styles.selected}>Selected</Text>}
+                  {colors.name === scheme.name && <Text style={styles.selected}>{t('common.selected')}</Text>}
                 </Pressable>
               ))}
             </ScrollView>
@@ -205,21 +217,21 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.pickerShell}>
             <View style={styles.pickerHeader}>
-              <Text accessibilityRole="header" style={styles.sectionTitle}>Choose location</Text>
-              <Pressable accessibilityRole="button" onPress={() => setPickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>Cancel</Text></Pressable>
+              <Text accessibilityRole="header" style={styles.sectionTitle}>{t('menu.location')}</Text>
+              <Pressable accessibilityRole="button" onPress={() => setPickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>{t('common.cancel')}</Text></Pressable>
             </View>
-            <Text style={styles.pickerHint}>Select your city to see its prayer times.</Text>
-            <TextInput accessibilityLabel="Search cities" placeholder="Search city or country" placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} autoCorrect={false} clearButtonMode="while-editing" style={[styles.search, { fontFamily }]} />
+            <Text style={styles.pickerHint}>{t('location.hint')}</Text>
+            <TextInput accessibilityLabel={t('location.searchLabel')} placeholder={t('location.searchPlaceholder')} placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} autoCorrect={false} clearButtonMode="while-editing" style={[styles.search, { fontFamily }]} />
             <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.cityList}>
               {results.map((item) => (
-                <Pressable key={item.city} accessibilityRole="button" accessibilityLabel={`${item.city}, ${item.country}`} accessibilityState={{ selected: item.city === location.city }} onPress={() => { setLocation(item); setPickerOpen(false); }} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
-                  <View><Text style={styles.cityName}>{item.city}</Text><Text style={styles.country}>{item.country}</Text></View>
-                  {item.city === location.city && <Text style={styles.selected}>Selected</Text>}
+                <Pressable key={item.city} accessibilityRole="button" accessibilityLabel={t('location.format', { city: t(item.cityKey), country: t(item.countryKey) })} accessibilityState={{ selected: item.city === location.city }} onPress={() => { setLocation(item); setPickerOpen(false); }} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
+                  <View><Text style={styles.cityName}>{t(item.cityKey)}</Text><Text style={styles.country}>{t(item.countryKey)}</Text></View>
+                  {item.city === location.city && <Text style={styles.selected}>{t('common.selected')}</Text>}
                 </Pressable>
               ))}
-              {results.length === 0 && <Text style={styles.empty}>No matching cities. Try another city or country.</Text>}
+              {results.length === 0 && <Text style={styles.empty}>{t('location.empty')}</Text>}
             </ScrollView>
-            <Text style={styles.sampleNote}>Sample locations and times for this preview.</Text>
+            <Text style={styles.sampleNote}>{t('location.sample')}</Text>
           </View>
         </SafeAreaView>
       </Modal>
@@ -255,6 +267,7 @@ const createStyles = (colors: ColorScheme, cornerRadius: number) => StyleSheet.c
   cityName: { fontSize: 17, fontWeight: '500', color: colors.ink },
   country: { fontSize: 13, color: colors.muted, marginTop: 5 },
   selected: { color: colors.green, fontSize: 12, fontWeight: '600' },
+  languageNote: { color: colors.muted, fontSize: 13, lineHeight: 21, marginTop: 16, marginBottom: 32 },
   settingsContent: { paddingTop: 28, paddingBottom: 24 },
   inputHint: { color: colors.muted, fontSize: 13, lineHeight: 20 },
   cornerPreview: { backgroundColor: colors.green, borderRadius: cornerRadius, padding: 24, marginTop: 28, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },

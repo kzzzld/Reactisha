@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n/provider';
 import { Tabs, TabList, TabSlot, TabTrigger, type TabTriggerSlotProps } from 'expo-router/ui';
 import type { ComponentProps } from 'react';
 import { Pressable, View } from 'react-native';
@@ -14,14 +15,15 @@ function TabButton({ children, isFocused, ...props }: TabButtonProps) {
   );
 }
 export function PrayerTabs() {
+  const { t } = useI18n();
   const { colors } = useAppPreferences();
   return (
     <Tabs style={{ flex: 1 }}>
       <TabSlot style={{ flex: 1 }} />
       <TabList asChild>
         <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingVertical: 10, borderTopWidth: 1, borderTopColor: colors.line, backgroundColor: colors.background }}>
-          <TabTrigger name="salat-timer" href="/" asChild><TabButton>Salat Timer</TabButton></TabTrigger>
-          <TabTrigger name="ayah" href="/ayah" asChild><TabButton>Ayah</TabButton></TabTrigger>
+          <TabTrigger name="salat-timer" href="/" asChild><TabButton>{t('app.name')}</TabButton></TabTrigger>
+          <TabTrigger name="ayah" href="/ayah" asChild><TabButton>{t('tabs.ayah')}</TabButton></TabTrigger>
         </View>
       </TabList>
     </Tabs>

@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n/provider';
 import { useEffect, useMemo, useRef, useState, type ComponentRef } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { AppText as Text } from '@/components/app-text';
@@ -7,6 +8,7 @@ import { fetchAyah, randomAyahNumber, type Ayah } from '@/services/ayah';
 
 type AyahState = { status: 'loading' } | { status: 'ready'; ayah: Ayah } | { status: 'error' };
 export default function AyahScreen() {
+  const { t } = useI18n();
   const { colors, cornerRadius, ayahSource } = useAppPreferences();
   const styles = useMemo(() => createStyles(colors, cornerRadius), [colors, cornerRadius]);
   const [request, setRequest] = useState(0);
@@ -42,20 +44,20 @@ export default function AyahScreen() {
   }
   return (
     <ScrollView ref={scrollRef} contentContainerStyle={styles.content}>
-      <Text accessibilityRole="header" style={styles.title}>Ayah</Text>
-      <Text style={styles.subtitle}>A verse to read and reflect on.</Text>
-      {state.status === 'loading' && <View style={styles.message}><ActivityIndicator color={colors.green} /><Text accessibilityLiveRegion="polite" style={styles.hint}>Loading an ayah…</Text></View>}
-      {state.status === 'error' && <View style={styles.message}><Text accessibilityRole="alert" style={styles.error}>Couldn’t load this ayah.</Text><Text style={styles.hint}>Check your connection and retry, or choose another Ayah source in the three-dot menu.</Text></View>}
+      <Text accessibilityRole="header" style={styles.title}>{t('tabs.ayah')}</Text>
+      <Text style={styles.subtitle}>{t('ayah.subtitle')}</Text>
+      {state.status === 'loading' && <View style={styles.message}><ActivityIndicator color={colors.green} /><Text accessibilityLiveRegion="polite" style={styles.hint}>{t('ayah.loading')}</Text></View>}
+      {state.status === 'error' && <View style={styles.message}><Text accessibilityRole="alert" style={styles.error}>{t('ayah.error')}</Text><Text style={styles.hint}>{t('ayah.errorHint')}</Text></View>}
       {state.status === 'ready' && <View style={styles.verse}>
         <Text selectable style={styles.arabic}>{state.ayah.arabic}</Text>
         <Text selectable style={styles.translation}>{state.ayah.english}</Text>
-        <Text style={styles.reference}>{state.ayah.surahName} · {state.ayah.surah}:{state.ayah.verse}</Text>
-        <Text style={styles.hint}>English translation · M. M. Pickthall</Text>
+        <Text style={styles.reference}>{t('ayah.reference', { name: state.ayah.surahName ?? t('ayah.surah', { number: state.ayah.surah }), surah: state.ayah.surah, verse: state.ayah.verse })}</Text>
+        <Text style={styles.hint}>{t('ayah.translation')}</Text>
       </View>}
       <Pressable accessibilityRole="button" accessibilityState={{ disabled: state.status === 'loading' }} disabled={state.status === 'loading'} onPress={loadAnother} style={({ pressed }) => [styles.button, (pressed || state.status === 'loading') && styles.dimmed]}>
-        <Text style={styles.buttonText}>{state.status === 'error' ? 'Retry' : 'Another ayah'}</Text>
+        <Text style={styles.buttonText}>{t(state.status === 'error' ? 'common.retry' : 'ayah.another')}</Text>
       </Pressable>
-      <Text style={styles.source}>Source: {ayahSource.name}</Text>
+      <Text style={styles.source}>{t('ayah.source', { source: t(ayahSource.nameKey) })}</Text>
     </ScrollView>
   );
 }

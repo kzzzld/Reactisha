@@ -1,9 +1,10 @@
+import type { TranslationKey } from '@/i18n/translate';
 import type { FontFamilyDefinition } from 'expo-font';
 
 export const fontOptions = [
-  { id: 'system', name: 'System', family: undefined, description: 'Your device’s default font' },
-  { id: 'jetbrains', name: 'JetBrains Mono', family: 'JetBrainsMono', description: 'Clear, spacious monospace' },
-  { id: 'iosevka', name: 'Iosevka', family: 'Iosevka', description: 'Slender, compact monospace' },
+  { id: 'system', name: 'System', nameKey: 'fonts.system.name' satisfies TranslationKey, family: undefined, descriptionKey: 'fonts.system.description' satisfies TranslationKey },
+  { id: 'jetbrains', name: 'JetBrains Mono', nameKey: 'fonts.jetbrainsMono.name' satisfies TranslationKey, family: 'JetBrainsMono', descriptionKey: 'fonts.jetbrainsMono.description' satisfies TranslationKey },
+  { id: 'iosevka', name: 'Iosevka', nameKey: 'fonts.iosevka.name' satisfies TranslationKey, family: 'Iosevka', descriptionKey: 'fonts.iosevka.description' satisfies TranslationKey },
 ] as const;
 export type FontOption = (typeof fontOptions)[number];
 
