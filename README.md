@@ -1,6 +1,6 @@
 # Reactisha
 
-React Native app using Expo, TypeScript, and Expo Router. The starter supports Android, iOS, and web; native Windows and macOS apps require separate platform work.
+Prayer times and Quran ayahs built with Expo, TypeScript, and Expo Router for Android, iOS, and web. Includes searchable AlAdhan locations, English and Turkish, automatic device-language detection, and saved preferences.
 
 ## Development
 
@@ -16,7 +16,21 @@ npm run lint
 npm run typecheck
 ```
 
-Edit screens in `src/app/`. The generated example screens are still present.
+Edit screens in `src/app/`. Run `node --test tests/*.test.cjs` for service and localization checks.
+
+## Android releases
+
+Download the signed APK from [GitHub Releases](https://github.com/kzzzld/Reactisha/releases). Open it on your Android device and allow installation from your browser if prompted.
+
+Create a signed standalone APK using Expo-managed Android credentials:
+
+```sh
+npx eas-cli@latest build --platform android --profile apk
+```
+
+The linked Expo project is named **Reactisha**. Its existing project ID and legacy `SalatTimer` URL slug are retained to preserve signing credentials and build history: [Expo project](https://expo.dev/accounts/kzzzld/projects/SalatTimer).
+
+Signing keys and APK files are not stored in Git; APKs are attached to releases.
 
 ## Android tools on this Mac
 
