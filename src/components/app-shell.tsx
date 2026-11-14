@@ -17,7 +17,8 @@ const DEFAULT_CORNER_RADIUS = 12;
 const MAX_CORNER_RADIUS = 40;
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const [ayahSource] = useState<AyahSource>(ayahSources[0]);
+  const [ayahSource, setAyahSource] = useState<AyahSource>(ayahSources[0]);
+  const [sourcePickerOpen, setSourcePickerOpen] = useState(false);
   const [fontsLoaded, fontError] = useFonts(bundledFonts);
   const [font, setFont] = useState<FontOption>(fontOptions[0]);
   const [fontPickerOpen, setFontPickerOpen] = useState(false);
@@ -84,9 +85,33 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Text style={styles.menuItemText}>Settings</Text>
                 <Text style={styles.country}>Corner rounding · {cornerRadius}</Text>
               </Pressable>
+              <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setSourcePickerOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
+                <Text style={styles.menuItemText}>Ayah source</Text>
+                <Text style={styles.country}>{ayahSource.name}</Text>
+              </Pressable>
             </View>
           </SafeAreaView>
         </Pressable>
+      </Modal>
+
+      <Modal visible={sourcePickerOpen} animationType="slide" onRequestClose={() => setSourcePickerOpen(false)}>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.pickerShell}>
+            <View style={styles.pickerHeader}>
+              <Text accessibilityRole="header" style={styles.sectionTitle}>Ayah source</Text>
+              <Pressable accessibilityRole="button" onPress={() => setSourcePickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>Done</Text></Pressable>
+            </View>
+            <Text style={styles.pickerHint}>Ayahs are fetched from your selected source. An internet connection is required.</Text>
+            <ScrollView contentContainerStyle={styles.themeList}>
+              {ayahSources.map((source) => (
+                <Pressable key={source.id} accessibilityRole="radio" accessibilityLabel={source.name} accessibilityState={{ checked: ayahSource.id === source.id }} onPress={() => setAyahSource(source)} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
+                  <View style={styles.schemeCopy}><Text style={styles.cityName}>{source.name}</Text><Text style={styles.country}>{source.description}</Text></View>
+                  {ayahSource.id === source.id && <Text style={styles.selected}>Selected</Text>}
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+        </SafeAreaView>
       </Modal>
 
       <Modal visible={settingsOpen} animationType="slide" onRequestClose={closeSettings}>
