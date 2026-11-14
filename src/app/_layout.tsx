@@ -1,10 +1,16 @@
-import { I18nProvider } from '@/i18n/provider';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { AppShell } from '@/components/app-shell';
-import { PrayerTabs } from '@/components/prayer-tabs';
+import { AppPreferencesProvider, useAppPreferences } from '@/context/app-preferences';
+import { I18nProvider } from '@/i18n/provider';
 
+export const unstable_settings = { anchor: '(tabs)' };
+
+function RootNavigator() {
+  const { colors } = useAppPreferences();
+  return <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />;
+}
 export default function RootLayout() {
   useEffect(() => { SplashScreen.hideAsync().catch(() => {}); }, []);
-  return <I18nProvider><AppShell><PrayerTabs /></AppShell></I18nProvider>;
+  return <I18nProvider><AppPreferencesProvider><RootNavigator /></AppPreferencesProvider></I18nProvider>;
 }
