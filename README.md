@@ -1,56 +1,43 @@
-# Welcome to your Expo app 👋
+# SalatTimer
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+React Native app using Expo, TypeScript, and Expo Router. The starter supports Android, iOS, and web; native Windows and macOS apps require separate platform work.
 
-## Get started
+## Development
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```sh
+npm install
+npm start
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Install Expo Go from Google Play on your Android phone. Connect the phone and computer to the same Wi-Fi network, then scan the terminal QR code from Expo Go. Use `npm run web` for the browser.
 
-### Other setup steps
+```sh
+npm run lint
+npm run typecheck
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Edit screens in `src/app/`. The generated example screens are still present.
 
-## Learn more
+## Android tools on this Mac
 
-To learn more about developing your project with Expo, look at the following resources:
+- Android Studio
+- Java 17 (Apple Silicon Homebrew installation)
+- Android SDK at `~/Library/Android/sdk`
+- Android SDK Platform 37.0, Build Tools 37.0.0, and platform tools
+- Android NDK 27.1.12297006 and CMake 3.22.1
+- Gradle 9.4.1 through the project's wrapper
+- Watchman for file watching
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+The Android and Java environment variables are configured in `~/.zprofile`. Open a new terminal after setup. No emulator is installed; this setup uses a physical Android phone.
 
-## Join the community
+`npm start` is the simplest way to open the app in Expo Go on your phone. For USB testing, enable Developer options and USB debugging on the phone, connect it, and accept the debugging prompt. `adb devices` should list it as `device`.
 
-Join our community of developers creating universal apps.
+`npm run android` opens Expo Go on a connected Android device. For a custom native development build, use `npm run android:build`; Gradle can download additional build dependencies on its first run.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## iOS
+
+iOS remains configured, but Xcode and the iOS simulator are intentionally not installed. Local iOS builds require Xcode. Supported features can be previewed on a physical iPhone using Expo Go; cloud builds are another option.
+
+## Dependency notes
+
+The lockfile pins installed dependencies. The current Expo and ESLint dependency trees report a moderate minimatch advisory. Compatible automatic fixes did not resolve it; avoid `npm audit fix --force`, which proposes a breaking Expo downgrade. Recheck with `npm audit` when updating dependencies.
