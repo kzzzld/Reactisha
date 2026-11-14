@@ -1,15 +1,22 @@
+import { useFonts } from 'expo-font';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Modal, Platform, Pressable, ScrollView, StatusBar, StyleSheet, Text, TextInput, View,
+  Modal, Platform, Pressable, ScrollView, StatusBar, StyleSheet, TextInput, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AppText as Text, FontFamilyContext } from '@/components/app-text';
+import { bundledFonts, fontOptions, type FontOption } from '@/data/fonts';
 import { colorSchemes, ColorScheme } from '@/data/color-schemes';
 import { locations, PrayerLocation, prayerNames } from '@/data/prayer-times';
 import { getPrayerState } from '@/utils/prayer-time';
 
 
 export default function HomeScreen() {
+  const [fontsLoaded, fontError] = useFonts(bundledFonts);
+  const [font, setFont] = useState<FontOption>(fontOptions[0]);
+  const [fontPickerOpen, setFontPickerOpen] = useState(false);
+  const fontFamily = fontsLoaded ? font.family : undefined;
   const [colors, setColors] = useState<ColorScheme>(colorSchemes[0]);
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [themePickerOpen, setThemePickerOpen] = useState(false);
@@ -27,6 +34,7 @@ export default function HomeScreen() {
   const results = locations.filter((item) => `${item.city} ${item.country}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
 
   return (
+    <FontFamilyContext.Provider value={fontFamily}>
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle={colors.dark ? "light-content" : "dark-content"} />
       <View style={styles.shell}>
@@ -43,7 +51,7 @@ export default function HomeScreen() {
           </View>
           <View style={styles.countdownSection}>
             <Text style={styles.nextPrayer}>{prayer.nextName} is next</Text>
-            <Text accessibilityLabel={`${prayer.countdown} until ${prayer.nextName}`} style={styles.countdown}>{prayer.countdown}</Text>
+            <Text numberOfLines={1} adjustsFontSizeToFit accessibilityLabel={`${prayer.countdown} until ${prayer.nextName}`} style={styles.countdown}>{prayer.countdown}</Text>
             <Text style={styles.until}>until {prayer.tomorrow ? 'tomorrow at ' : ''}{location.times[prayer.nextIndex]}</Text>
             <View style={styles.dividerDetail}><View style={styles.detailLine} /><View style={styles.detailDiamond} /><View style={styles.detailLine} /></View>
             <Text style={styles.reflection}>A moment to pause. A time to reconnect.</Text>
@@ -84,9 +92,41 @@ export default function HomeScreen() {
                 <Text style={styles.menuItemText}>Color scheme</Text>
                 <Text style={styles.country}>{colors.name}</Text>
               </Pressable>
+              <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setFontPickerOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
+                <Text style={styles.menuItemText}>Font</Text>
+                <Text style={styles.country}>{font.name}</Text>
+              </Pressable>
             </View>
           </SafeAreaView>
         </Pressable>
+      </Modal>
+
+      <Modal visible={fontPickerOpen} animationType="slide" onRequestClose={() => setFontPickerOpen(false)}>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.pickerShell}>
+            <View style={styles.pickerHeader}>
+              <Text accessibilityRole="header" style={styles.sectionTitle}>Font</Text>
+              <Pressable accessibilityRole="button" onPress={() => setFontPickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>Done</Text></Pressable>
+            </View>
+            <Text style={styles.pickerHint}>Choose a font. Preview it across the app instantly.</Text>
+            {!fontsLoaded && <Text accessibilityRole="alert" style={styles.pickerHint}>{fontError ? 'Custom fonts couldn’t load. System is still available. Reopen the app to try again.' : 'Loading bundled fonts…'}</Text>}
+            <ScrollView contentContainerStyle={styles.themeList}>
+              {fontOptions.map((option) => {
+                const disabled = option.id !== 'system' && !fontsLoaded;
+                return (
+                  <Pressable key={option.id} accessibilityRole="radio" accessibilityLabel={option.name} accessibilityState={{ checked: font.id === option.id, disabled }} disabled={disabled} onPress={() => setFont(option)} style={({ pressed }) => [styles.fontRow, (pressed || disabled) && styles.pressed]}>
+                    <View style={styles.schemeCopy}>
+                      <Text style={[styles.cityName, { fontFamily: disabled ? undefined : option.family }]}>{option.name}</Text>
+                      <Text style={styles.country}>{option.description}</Text>
+                      <Text style={[styles.fontPreview, { fontFamily: disabled ? undefined : option.family }]}>Fajr  06:21  ·  0123456789</Text>
+                    </View>
+                    {font.id === option.id && <Text style={styles.selected}>Selected</Text>}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </SafeAreaView>
       </Modal>
 
       <Modal visible={themePickerOpen} animationType="slide" onRequestClose={() => setThemePickerOpen(false)}>
@@ -120,7 +160,7 @@ export default function HomeScreen() {
               <Pressable accessibilityRole="button" onPress={() => setPickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>Cancel</Text></Pressable>
             </View>
             <Text style={styles.pickerHint}>Select your city to see its prayer times.</Text>
-            <TextInput accessibilityLabel="Search cities" placeholder="Search city or country" placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} autoCorrect={false} clearButtonMode="while-editing" style={styles.search} />
+            <TextInput accessibilityLabel="Search cities" placeholder="Search city or country" placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} autoCorrect={false} clearButtonMode="while-editing" style={[styles.search, { fontFamily }]} />
             <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.cityList}>
               {results.map((item) => (
                 <Pressable key={item.city} accessibilityRole="button" accessibilityLabel={`${item.city}, ${item.country}`} accessibilityState={{ selected: item.city === location.city }} onPress={() => { setLocation(item); setNow(new Date()); setPickerOpen(false); }} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
@@ -135,6 +175,7 @@ export default function HomeScreen() {
         </SafeAreaView>
       </Modal>
     </SafeAreaView>
+    </FontFamilyContext.Provider>
   );
 }
 
@@ -142,7 +183,7 @@ const createStyles = (colors: ColorScheme) => StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: colors.background },
   shell: { flex: 1, width: '100%', maxWidth: 560, alignSelf: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 28, paddingTop: 12, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: colors.line },
-  brand: { fontSize: 25, fontWeight: '600', color: colors.ink, letterSpacing: -0.7 },
+  brand: { flexShrink: 1, fontSize: 25, fontWeight: '600', color: colors.ink, letterSpacing: -0.7 },
   menuButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   dots: { gap: 4 }, dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.ink },
   pressed: { opacity: 0.55 },
@@ -152,7 +193,7 @@ const createStyles = (colors: ColorScheme) => StyleSheet.create({
   location: { color: colors.muted, fontSize: 14, flexShrink: 1 },
   countdownSection: { alignItems: 'center', paddingTop: 35, paddingBottom: 42 },
   nextPrayer: { fontSize: 24, fontWeight: '500', color: colors.green },
-  countdown: { fontSize: 56, lineHeight: 76, fontWeight: '300', letterSpacing: -1.6, color: colors.ink, fontVariant: ['tabular-nums'], marginTop: 6 },
+  countdown: { width: '100%', textAlign: 'center', fontSize: 56, lineHeight: 76, fontWeight: '300', letterSpacing: -1.6, color: colors.ink, fontVariant: ['tabular-nums'], marginTop: 6 },
   until: { color: colors.muted, fontSize: 14, marginTop: 2 },
   dividerDetail: { flexDirection: 'row', gap: 12, alignItems: 'center', marginTop: 28, marginBottom: 18 },
   detailLine: { width: 34, height: 1, backgroundColor: colors.line },
@@ -188,6 +229,8 @@ const createStyles = (colors: ColorScheme) => StyleSheet.create({
   cityName: { fontSize: 17, fontWeight: '500', color: colors.ink },
   country: { fontSize: 13, color: colors.muted, marginTop: 5 },
   selected: { color: colors.green, fontSize: 12, fontWeight: '600' },
+  fontRow: { minHeight: 132, paddingVertical: 20, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: colors.line },
+  fontPreview: { fontSize: 14, lineHeight: 22, color: colors.ink, marginTop: 14 },
   themeList: { paddingTop: 20, paddingBottom: 24 },
   schemeInfo: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
   schemeCopy: { flex: 1 },
