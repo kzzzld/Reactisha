@@ -12,13 +12,35 @@ import { locations, PrayerLocation, prayerNames } from '@/data/prayer-times';
 import { getPrayerState } from '@/utils/prayer-time';
 
 
+const DEFAULT_CORNER_RADIUS = 12;
+const MAX_CORNER_RADIUS = 40;
+
 export default function HomeScreen() {
   const [fontsLoaded, fontError] = useFonts(bundledFonts);
   const [font, setFont] = useState<FontOption>(fontOptions[0]);
   const [fontPickerOpen, setFontPickerOpen] = useState(false);
   const fontFamily = fontsLoaded ? font.family : undefined;
   const [colors, setColors] = useState<ColorScheme>(colorSchemes[0]);
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const [cornerRadius, setCornerRadius] = useState(DEFAULT_CORNER_RADIUS);
+  const [cornerInput, setCornerInput] = useState(String(DEFAULT_CORNER_RADIUS));
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const normalizedCornerInput = cornerInput.trim().replace(',', '.');
+  const parsedCornerRadius = Number(normalizedCornerInput);
+  const validCornerInput = /^\d+(\.\d+)?$/.test(normalizedCornerInput)
+    && Number.isFinite(parsedCornerRadius) && parsedCornerRadius >= 0 && parsedCornerRadius <= MAX_CORNER_RADIUS;
+  const styles = useMemo(() => createStyles(colors, cornerRadius), [colors, cornerRadius]);
+  function updateCornerInput(value: string) {
+    setCornerInput(value);
+    const normalized = value.trim().replace(',', '.');
+    const radius = Number(normalized);
+    if (/^\d+(\.\d+)?$/.test(normalized) && Number.isFinite(radius) && radius >= 0 && radius <= MAX_CORNER_RADIUS) {
+      setCornerRadius(radius);
+    }
+  }
+  function closeSettings() {
+    setCornerInput(String(cornerRadius));
+    setSettingsOpen(false);
+  }
   const [themePickerOpen, setThemePickerOpen] = useState(false);
   const [location, setLocation] = useState<PrayerLocation>(locations[0]);
   const [now, setNow] = useState(() => new Date());
@@ -96,9 +118,49 @@ export default function HomeScreen() {
                 <Text style={styles.menuItemText}>Font</Text>
                 <Text style={styles.country}>{font.name}</Text>
               </Pressable>
+              <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setCornerInput(String(cornerRadius)); setSettingsOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
+                <Text style={styles.menuItemText}>Settings</Text>
+                <Text style={styles.country}>Corner rounding · {cornerRadius}</Text>
+              </Pressable>
             </View>
           </SafeAreaView>
         </Pressable>
+      </Modal>
+
+      <Modal visible={settingsOpen} animationType="slide" onRequestClose={closeSettings}>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.pickerShell}>
+            <View style={styles.pickerHeader}>
+              <Text accessibilityRole="header" style={styles.sectionTitle}>Settings</Text>
+              <Pressable accessibilityRole="button" accessibilityState={{ disabled: !validCornerInput }} disabled={!validCornerInput} onPress={closeSettings} style={[styles.cancelButton, !validCornerInput && styles.pressed]}><Text style={styles.cancel}>Done</Text></Pressable>
+            </View>
+            <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.settingsContent}>
+              <Text style={styles.cityName}>Corner rounding</Text>
+              <Text style={styles.pickerHint}>Use 0 for square corners, or a higher number for rounder corners. Changes preview instantly.</Text>
+              <TextInput
+                accessibilityLabel="Corner rounding"
+                accessibilityHint="Enter a number from 0 to 40. Zero makes corners square."
+                value={cornerInput}
+                onChangeText={updateCornerInput}
+                inputMode="decimal"
+                keyboardType="decimal-pad"
+                autoCorrect={false}
+                selectTextOnFocus
+                returnKeyType="done"
+                onSubmitEditing={() => { if (validCornerInput) closeSettings(); }}
+                style={[styles.search, { fontFamily }]}
+              />
+              <Text accessibilityRole={validCornerInput ? undefined : 'alert'} style={styles.inputHint}>{validCornerInput ? '0–40 · Default: 12' : 'Enter a number from 0 to 40.'}</Text>
+              <View style={styles.cornerPreview}>
+                <Text style={styles.previewName}>Prayer time</Text>
+                <Text style={styles.previewTime}>06:21</Text>
+              </View>
+              <Pressable accessibilityRole="button" onPress={() => { setCornerRadius(DEFAULT_CORNER_RADIUS); setCornerInput(String(DEFAULT_CORNER_RADIUS)); }} style={({ pressed }) => [styles.resetButton, pressed && styles.pressed]}>
+                <Text style={styles.cancel}>Reset to default</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </SafeAreaView>
       </Modal>
 
       <Modal visible={fontPickerOpen} animationType="slide" onRequestClose={() => setFontPickerOpen(false)}>
@@ -179,7 +241,7 @@ export default function HomeScreen() {
   );
 }
 
-const createStyles = (colors: ColorScheme) => StyleSheet.create({
+const createStyles = (colors: ColorScheme, cornerRadius: number) => StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: colors.background },
   shell: { flex: 1, width: '100%', maxWidth: 560, alignSelf: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 28, paddingTop: 12, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: colors.line },
@@ -201,11 +263,11 @@ const createStyles = (colors: ColorScheme) => StyleSheet.create({
   reflection: { fontSize: 13, color: colors.muted, textAlign: 'center' },
   scheduleHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   sectionTitle: { fontSize: 22, fontWeight: '600', color: colors.ink, letterSpacing: -0.5, flexShrink: 1 },
-  today: { fontSize: 12, color: colors.green, backgroundColor: colors.pale, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 20 },
+  today: { fontSize: 12, color: colors.green, backgroundColor: colors.pale, paddingVertical: 6, paddingHorizontal: 12, borderRadius: cornerRadius },
   date: { fontSize: 13, color: colors.muted, marginTop: 7, marginBottom: 20 },
   schedule: { borderTopWidth: 1, borderTopColor: colors.line },
   prayerRow: { minHeight: 62, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingHorizontal: 14, borderBottomWidth: 1, borderBottomColor: colors.line },
-  nextRow: { backgroundColor: colors.green, borderRadius: 12, borderBottomWidth: 0, marginVertical: 4 },
+  nextRow: { backgroundColor: colors.green, borderRadius: cornerRadius, borderBottomWidth: 0, marginVertical: 4 },
   prayerLabel: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1, flexWrap: 'wrap' },
   prayerName: { fontSize: 17, color: colors.ink, fontWeight: '500' },
   prayerTime: { fontSize: 18, color: colors.ink, fontWeight: '500', fontVariant: ['tabular-nums'] },
@@ -215,7 +277,7 @@ const createStyles = (colors: ColorScheme) => StyleSheet.create({
   footer: { textAlign: 'center', fontSize: 12, color: colors.muted, marginTop: 24 },
   menuBackdrop: { flex: 1, backgroundColor: '#142A2220' },
   menuSafeArea: { alignItems: 'flex-end', width: '100%', maxWidth: 560, alignSelf: 'center', paddingRight: 24 },
-  menuPanel: { backgroundColor: colors.background, borderRadius: 12, marginTop: 60, boxShadow: '0 8px 28px #142A2226' },
+  menuPanel: { overflow: 'hidden', backgroundColor: colors.background, borderRadius: cornerRadius, marginTop: 60, boxShadow: '0 8px 28px #142A2226' },
   menuItem: { paddingVertical: 20, paddingHorizontal: 24, minWidth: 200 },
   menuItemText: { fontSize: 16, color: colors.ink },
   pickerShell: { flex: 1, width: '100%', maxWidth: 560, alignSelf: 'center', padding: 24 },
@@ -223,18 +285,24 @@ const createStyles = (colors: ColorScheme) => StyleSheet.create({
   cancelButton: { minHeight: 44, justifyContent: 'center', paddingLeft: 12 },
   cancel: { fontSize: 16, color: colors.green },
   pickerHint: { color: colors.muted, fontSize: 14, marginTop: 12, lineHeight: 21 },
-  search: { backgroundColor: colors.input, borderRadius: 12, paddingHorizontal: 16, paddingVertical: Platform.OS === 'ios' ? 16 : 13, color: colors.ink, fontSize: 16, marginTop: 24, marginBottom: 12, minHeight: 50 },
+  search: { backgroundColor: colors.input, borderRadius: cornerRadius, paddingHorizontal: 16, paddingVertical: Platform.OS === 'ios' ? 16 : 13, color: colors.ink, fontSize: 16, marginTop: 24, marginBottom: 12, minHeight: 50 },
   cityList: { paddingBottom: 20 },
   cityRow: { minHeight: 80, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: colors.line },
   cityName: { fontSize: 17, fontWeight: '500', color: colors.ink },
   country: { fontSize: 13, color: colors.muted, marginTop: 5 },
   selected: { color: colors.green, fontSize: 12, fontWeight: '600' },
+  settingsContent: { paddingTop: 28, paddingBottom: 24 },
+  inputHint: { color: colors.muted, fontSize: 13, lineHeight: 20 },
+  cornerPreview: { backgroundColor: colors.green, borderRadius: cornerRadius, padding: 24, marginTop: 28, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  previewName: { color: colors.onAccent, fontSize: 17, flexShrink: 1 },
+  previewTime: { color: colors.onAccent, fontSize: 20, fontVariant: ['tabular-nums'] },
+  resetButton: { minHeight: 48, alignSelf: 'flex-start', justifyContent: 'center', marginTop: 16 },
   fontRow: { minHeight: 132, paddingVertical: 20, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: colors.line },
   fontPreview: { fontSize: 14, lineHeight: 22, color: colors.ink, marginTop: 14 },
   themeList: { paddingTop: 20, paddingBottom: 24 },
   schemeInfo: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
   schemeCopy: { flex: 1 },
-  swatch: { width: 40, height: 40, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  swatch: { width: 40, height: 40, borderRadius: cornerRadius, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   swatchAccent: { width: 16, height: 16, borderRadius: 8 },
   empty: { fontSize: 15, color: colors.muted, textAlign: 'center', paddingVertical: 36, lineHeight: 23 },
 });
