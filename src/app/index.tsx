@@ -31,7 +31,7 @@ export default function HomeScreen() {
       <StatusBar barStyle={colors.dark ? "light-content" : "dark-content"} />
       <View style={styles.shell}>
         <View style={styles.header}>
-          <Text accessibilityRole="header" style={styles.brand}>SalatTimer</Text>
+          <Text accessibilityRole="header" style={styles.brand}>Salat Timer</Text>
           <Pressable accessibilityRole="button" accessibilityLabel="Open menu" accessibilityState={{ expanded: menuOpen }} onPress={() => setMenuOpen(true)} style={({ pressed }) => [styles.menuButton, pressed && styles.pressed]}>
             <View style={styles.dots}>{[0, 1, 2].map((dot) => <View key={dot} style={styles.dot} />)}</View>
           </Pressable>
