@@ -24,7 +24,15 @@ export function parsePrayerTimes(payload: unknown, date: string, timezone: strin
 
 export async function fetchPrayerTimes(location: PrayerLocation, date: string, signal: AbortSignal) {
   const query = new URLSearchParams({ latitude: String(location.latitude), longitude: String(location.longitude), method: String(location.method), timezonestring: location.timezone, iso8601: 'true' });
-  const response = await fetch(`https://api.aladhan.com/v1/timings/${date}?${query}`, { signal });
+  if (location.lookupByCity) {
+    query.delete('latitude');
+    query.delete('longitude');
+    query.set('city', location.city);
+    query.set('country', location.country);
+    if (location.state) query.set('state', location.state);
+  }
+  const endpoint = location.lookupByCity ? 'timingsByCity' : 'timings';
+  const response = await fetch(`https://api.aladhan.com/v1/${endpoint}/${date}?${query}`, { signal });
   if (!response.ok) throw new Error(`Prayer provider returned ${response.status}`);
   return parsePrayerTimes(await response.json(), date, location.timezone);
 }

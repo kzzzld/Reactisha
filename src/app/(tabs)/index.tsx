@@ -21,7 +21,7 @@ export default function SalatTimerScreen() {
   const [reload, setReload] = useState(0);
   const [result, setResult] = useState<{ key: string; today: DailyPrayers; tomorrow: DailyPrayers } | null>(null);
   const [errorKey, setErrorKey] = useState<string | null>(null);
-  const key = `${location.city}:${day}:${reload}`;
+  const key = `${location.city}:${location.country}:${location.state}:${location.latitude}:${location.longitude}:${location.method}:${day}:${reload}`;
   useEffect(() => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
@@ -40,7 +40,7 @@ export default function SalatTimerScreen() {
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.locationLine}>
             <View style={styles.locationDot} />
-            <Text style={styles.location}>{t('location.format', { city: t(location.cityKey), country: t(location.countryKey) })}</Text>
+            <Text style={styles.location}>{t('location.format', { city: (location.cityKey ? t(location.cityKey) : location.city), country: (location.countryKey ? t(location.countryKey) : location.country) })}</Text>
           </View>
           {!prayer && <View style={styles.countdownSection}>
             <Text accessibilityRole="alert" style={styles.reflection}>{t(error ? 'prayer.error' : 'prayer.loading')}</Text>

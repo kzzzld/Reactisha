@@ -12,4 +12,8 @@ export const locations = [
   { city: 'Dubai', country: 'United Arab Emirates', cityKey: 'cities.dubai' satisfies TranslationKey, countryKey: 'countries.unitedArabEmirates' satisfies TranslationKey, timezone: 'Asia/Dubai', latitude: 25.2048, longitude: 55.2708, method: 16 },
   { city: 'New York', country: 'United States', cityKey: 'cities.newYork' satisfies TranslationKey, countryKey: 'countries.unitedStates' satisfies TranslationKey, timezone: 'America/New_York', latitude: 40.7128, longitude: -74.006, method: 2 },
 ] as const;
-export type PrayerLocation = (typeof locations)[number];
+export type PrayerLocation = {
+  city: string; country: string; timezone: string; latitude: number; longitude: number; method: number;
+  cityKey?: TranslationKey; countryKey?: TranslationKey;
+  lookupByCity?: boolean; state?: string;
+};

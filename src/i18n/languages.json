@@ -123,7 +123,11 @@
       "prayer.loading": "Loading prayer times…",
       "prayer.error": "Prayer times could not be loaded. Check your connection and try again.",
       "prayer.retry": "Try again",
-      "prayer.source": "AlAdhan · {method} calculation. Local mosque times may differ."
+      "prayer.source": "AlAdhan · {method} calculation. Local mosque times may differ.",
+      "location.catalogSource": "Cities from AlAdhan’s published city directory.",
+      "location.refine": "Showing the first 20 matches. Search to narrow the list.",
+      "location.lookupError": "Could not look up this city. Check your connection and select it again to retry.",
+      "location.loading": "Looking up city…"
     }
   },
   "tr": {
@@ -250,7 +254,11 @@
       "prayer.loading": "Namaz vakitleri yükleniyor…",
       "prayer.error": "Namaz vakitleri yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.",
       "prayer.retry": "Tekrar dene",
-      "prayer.source": "AlAdhan · {method} hesaplaması. Yerel cami vakitleri farklı olabilir."
+      "prayer.source": "AlAdhan · {method} hesaplaması. Yerel cami vakitleri farklı olabilir.",
+      "location.catalogSource": "Şehirler AlAdhan’ın yayımladığı şehir listesinden alınmıştır.",
+      "location.refine": "İlk 20 sonuç gösteriliyor. Listeyi daraltmak için arayın.",
+      "location.lookupError": "Şehir bilgileri alınamadı. Bağlantınızı kontrol edip tekrar denemek için şehri yeniden seçin.",
+      "location.loading": "Şehir bilgileri alınıyor…"
     }
   }
 }

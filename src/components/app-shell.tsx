@@ -1,21 +1,19 @@
 import { router } from 'expo-router';
 import { useMemo, useState, type ReactNode } from 'react';
-import { Modal, Platform, Pressable, ScrollView, StatusBar, StyleSheet, TextInput, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText as Text } from '@/components/app-text';
 import { useAppPreferences } from '@/context/app-preferences';
 import { type ColorScheme } from '@/data/color-schemes';
-import { locations } from '@/data/prayer-times';
+import { CityPicker } from '@/components/city-picker';
 import { useI18n } from '@/i18n/provider';
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useI18n();
-  const { colors, cornerRadius, location, setLocation, fontFamily } = useAppPreferences();
+  const { colors, cornerRadius } = useAppPreferences();
   const styles = useMemo(() => createStyles(colors, cornerRadius), [colors, cornerRadius]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const results = locations.filter((item) => `${item.city} ${item.country} ${t(item.cityKey)} ${t(item.countryKey)}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle={colors.dark ? 'light-content' : 'dark-content'} />
@@ -32,7 +30,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Pressable accessibilityRole="button" accessibilityLabel={t('menu.close')} style={styles.menuBackdrop} onPress={() => setMenuOpen(false)}>
           <SafeAreaView style={styles.menuSafeArea}>
             <View style={styles.menuPanel}>
-              <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setQuery(''); setPickerOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
+              <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setPickerOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
                 <Text style={styles.menuItemText}>{t('menu.location')}</Text>
               </Pressable>
               <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); router.push('/settings'); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
@@ -50,15 +48,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Pressable accessibilityRole="button" onPress={() => setPickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>{t('common.cancel')}</Text></Pressable>
             </View>
             <Text style={styles.pickerHint}>{t('location.hint')}</Text>
-            <TextInput accessibilityLabel={t('location.searchLabel')} placeholder={t('location.searchPlaceholder')} placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} autoCorrect={false} clearButtonMode="while-editing" style={[styles.search, { fontFamily }]} />
             <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.cityList}>
-              {results.map((item) => (
-                <Pressable key={item.city} accessibilityRole="button" accessibilityLabel={t('location.format', { city: t(item.cityKey), country: t(item.countryKey) })} accessibilityState={{ selected: item.city === location.city }} onPress={() => { setLocation(item); setPickerOpen(false); }} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
-                  <View><Text style={styles.cityName}>{t(item.cityKey)}</Text><Text style={styles.country}>{t(item.countryKey)}</Text></View>
-                  {item.city === location.city && <Text style={styles.selected}>{t('common.selected')}</Text>}
-                </Pressable>
-              ))}
-              {results.length === 0 && <Text style={styles.empty}>{t('location.empty')}</Text>}
+              {pickerOpen && <CityPicker onSelected={() => setPickerOpen(false)} />}
             </ScrollView>
             <Text style={styles.sampleNote}>{t('location.sample')}</Text>
           </View>

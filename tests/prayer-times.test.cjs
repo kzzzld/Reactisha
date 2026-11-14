@@ -65,3 +65,18 @@ test('requests carry coordinates, method, timezone and cancellation; failures pr
     await assert.rejects(service.fetchPrayerTimes(location, '14-11-2026', controller.signal), /503/);
   } finally { global.fetch = original; }
 });
+
+test('directory selections keep city and state for subsequent daily requests', async () => {
+  const original = global.fetch;
+  try {
+    global.fetch = async (url) => {
+      const request = new URL(url);
+      assert.equal(request.pathname, '/v1/timingsByCity/14-11-2026');
+      assert.equal(request.searchParams.get('city'), 'Istanbul');
+      assert.equal(request.searchParams.get('country'), 'Turkey');
+      assert.equal(request.searchParams.has('latitude'), false);
+      return { ok: true, json: async () => payload() };
+    };
+    await service.fetchPrayerTimes({ city: 'Istanbul', country: 'Turkey', lookupByCity: true, timezone: 'Europe/Istanbul', method: 13, latitude: 0, longitude: 0 }, '14-11-2026', new AbortController().signal);
+  } finally { global.fetch = original; }
+});

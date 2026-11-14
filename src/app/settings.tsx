@@ -7,17 +7,16 @@ import { SettingsSection } from '@/components/settings-section';
 import { DEFAULT_CORNER_RADIUS, MAX_CORNER_RADIUS, useAppPreferences } from '@/context/app-preferences';
 import { colorSchemes, type ColorScheme } from '@/data/color-schemes';
 import { fontOptions } from '@/data/fonts';
-import { locations } from '@/data/prayer-times';
+import { CityPicker } from '@/components/city-picker';
 import { useI18n } from '@/i18n/provider';
 import { availableLanguages } from '@/i18n/translate';
 import { ayahSources } from '@/services/ayah';
 
 export default function SettingsScreen() {
   const { t, language, setLanguage } = useI18n();
-  const { colors, setColors, cornerRadius, setCornerRadius, font, setFont, fontFamily, fontsLoaded, fontError, ayahSource, setAyahSource, location, setLocation } = useAppPreferences();
+  const { colors, setColors, cornerRadius, setCornerRadius, font, setFont, fontFamily, fontsLoaded, fontError, ayahSource, setAyahSource, location } = useAppPreferences();
   const styles = useMemo(() => createStyles(colors, cornerRadius), [colors, cornerRadius]);
   const [cornerInput, setCornerInput] = useState(String(cornerRadius));
-  const [query, setQuery] = useState('');
   const normalizedCornerInput = cornerInput.trim().replace(',', '.');
   const parsedCornerRadius = Number(normalizedCornerInput);
   const validCornerInput = /^\d+(\.\d+)?$/.test(normalizedCornerInput)
@@ -32,7 +31,6 @@ export default function SettingsScreen() {
     if (router.canGoBack()) router.back();
     else router.replace('/');
   }
-  const results = locations.filter((item) => `${item.city} ${item.country} ${t(item.cityKey)} ${t(item.countryKey)}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle={colors.dark ? 'light-content' : 'dark-content'} />
@@ -90,15 +88,8 @@ export default function SettingsScreen() {
                 </Pressable>
               ))}
           </SettingsSection>
-          <SettingsSection title={t('menu.location')} value={t('location.format', { city: t(location.cityKey), country: t(location.countryKey) })}>
-            <TextInput accessibilityLabel={t('location.searchLabel')} placeholder={t('location.searchPlaceholder')} placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} autoCorrect={false} clearButtonMode="while-editing" style={[styles.search, { fontFamily }]} />
-            {results.map((item) => (
-              <Pressable key={item.city} accessibilityRole="radio" accessibilityLabel={t('location.format', { city: t(item.cityKey), country: t(item.countryKey) })} accessibilityState={{ checked: item.city === location.city }} onPress={() => setLocation(item)} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
-                <View style={styles.schemeCopy}><Text style={styles.cityName}>{t(item.cityKey)}</Text><Text style={styles.country}>{t(item.countryKey)}</Text></View>
-                {item.city === location.city && <Text style={styles.selected}>{t('common.selected')}</Text>}
-              </Pressable>
-            ))}
-            {results.length === 0 && <Text style={styles.empty}>{t('location.empty')}</Text>}
+          <SettingsSection title={t('menu.location')} value={t('location.format', { city: (location.cityKey ? t(location.cityKey) : location.city), country: (location.countryKey ? t(location.countryKey) : location.country) })}>
+            <CityPicker />
             <Text style={styles.sampleNote}>{t('location.sample')}</Text>
           </SettingsSection>
           <View style={styles.roundingSection}>
