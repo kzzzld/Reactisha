@@ -49,3 +49,13 @@ Docs: https://docs.expo.dev/eas/index.md
 - If unrelated work is already present, leave it uncommitted unless the user explicitly asks to include it.
 - Do not amend, reset, squash, or otherwise rewrite existing commits unless explicitly requested. Do not push to a remote unless requested.
 - Before ending the task, confirm your changes are committed and report the commit hashes and any remaining uncommitted work. If permissions or Git configuration prevent a commit, explain the blocker instead of claiming completion.
+
+## Translations and user-facing text
+
+- Put every new or changed app-owned user-facing string in `src/i18n/languages.json` and render it through `useI18n().t(...)`. This applies to all screens, components, tabs, menus, settings, picker labels/descriptions, accessibility labels/hints, placeholders, validation, loading, error, and empty states. Do this automatically as part of each change, without waiting for the user to request translations.
+- Use stable, semantic translation keys. Update every supported language with the same keys and named placeholders. If a translation cannot be supplied reliably, explicitly use the English fallback text and report that limitation; never invent a translation you cannot support.
+- Translate complete messages with named placeholders, such as `t('prayer.next', { prayer })`. Do not concatenate translated fragments or embed English words in interpolated UI text. Keep internal IDs, API identifiers, routes, and lookup names stable; display their catalog keys instead.
+- Format dates and locale-sensitive numbers with the selected locale from `useI18n()`. Preserve intentional clock/countdown formats. Allow translated labels to wrap and respect text scaling.
+- Display network-provided scripture and translations verbatim, with their source/edition attribution. UI localization does not authorize translating, paraphrasing, or changing an ayah or its translation. Proper names supplied by a provider, numeric data, URLs, code examples, and developer-only errors do not need catalog entries.
+- Follow `src/i18n/README.md` when adding a language. Implement and verify RTL support before adding an RTL locale.
+- Run `node --test tests/*.test.cjs` plus lint and typecheck before committing localization or UI-copy changes. Check for hardcoded rendered strings, matching catalog keys/placeholders, English fallback, and behavior after switching languages.
