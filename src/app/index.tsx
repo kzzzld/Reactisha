@@ -4,15 +4,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { colorSchemes, ColorScheme } from '@/data/color-schemes';
 import { locations, PrayerLocation, prayerNames } from '@/data/prayer-times';
 import { getPrayerState } from '@/utils/prayer-time';
 
 
-const defaultColors = { name: 'Warm light', dark: false, background: '#F8F7F2', ink: '#213C32', muted: '#647168', line: '#DEDFD5', green: '#234F3C', pale: '#E7EDDF', input: '#ECEEE5', onAccent: '#FFFFFF' };
-const colors = defaultColors;
-
 export default function HomeScreen() {
+  const [colors, setColors] = useState<ColorScheme>(colorSchemes[0]);
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const [themePickerOpen, setThemePickerOpen] = useState(false);
   const [location, setLocation] = useState<PrayerLocation>(locations[0]);
   const [now, setNow] = useState(() => new Date());
   const [menuOpen, setMenuOpen] = useState(false);
@@ -80,9 +80,36 @@ export default function HomeScreen() {
               <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setQuery(''); setPickerOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
                 <Text style={styles.menuItemText}>Choose location</Text>
               </Pressable>
+              <Pressable accessibilityRole="button" onPress={() => { setMenuOpen(false); setThemePickerOpen(true); }} style={({ pressed }) => [styles.menuItem, pressed && styles.pressed]}>
+                <Text style={styles.menuItemText}>Color scheme</Text>
+                <Text style={styles.country}>{colors.name}</Text>
+              </Pressable>
             </View>
           </SafeAreaView>
         </Pressable>
+      </Modal>
+
+      <Modal visible={themePickerOpen} animationType="slide" onRequestClose={() => setThemePickerOpen(false)}>
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.pickerShell}>
+            <View style={styles.pickerHeader}>
+              <Text accessibilityRole="header" style={styles.sectionTitle}>Color scheme</Text>
+              <Pressable accessibilityRole="button" onPress={() => setThemePickerOpen(false)} style={styles.cancelButton}><Text style={styles.cancel}>Done</Text></Pressable>
+            </View>
+            <Text style={styles.pickerHint}>Make room for your kind of calm.</Text>
+            <ScrollView contentContainerStyle={styles.themeList}>
+              {colorSchemes.map((scheme) => (
+                <Pressable key={scheme.name} accessibilityRole="radio" accessibilityState={{ checked: colors.name === scheme.name }} accessibilityLabel={scheme.name} onPress={() => setColors(scheme)} style={({ pressed }) => [styles.cityRow, pressed && styles.pressed]}>
+                  <View style={styles.schemeInfo}>
+                    <View style={[styles.swatch, { backgroundColor: scheme.background, borderColor: scheme.muted }]}><View style={[styles.swatchAccent, { backgroundColor: scheme.green }]} /></View>
+                    <View style={styles.schemeCopy}><Text style={styles.cityName}>{scheme.name}</Text><Text style={styles.country}>{scheme.description}</Text></View>
+                  </View>
+                  {colors.name === scheme.name && <Text style={styles.selected}>Selected</Text>}
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+        </SafeAreaView>
       </Modal>
 
       <Modal visible={pickerOpen} animationType="slide" onRequestClose={() => setPickerOpen(false)}>
@@ -111,7 +138,7 @@ export default function HomeScreen() {
   );
 }
 
-const createStyles = (colors: typeof defaultColors) => StyleSheet.create({
+const createStyles = (colors: ColorScheme) => StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: colors.background },
   shell: { flex: 1, width: '100%', maxWidth: 560, alignSelf: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 28, paddingTop: 12, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: colors.line },
