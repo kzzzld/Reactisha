@@ -39,3 +39,13 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## Git commits
+
+- After completing and validating each logical change, create a focused Git commit automatically. Do not ask for confirmation to commit; the user has authorized local commits as part of the normal workflow.
+- Keep unrelated changes in separate commits. Use concise, descriptive commit messages that explain the resulting behavior.
+- Run lint and typecheck before committing code changes. Fix failures introduced by your work before committing; report any pre-existing failures.
+- Inspect the working tree and staged diff before committing. Stage only files or hunks belonging to your change; preserve unrelated user work and never commit secrets, generated build output, or local environment files.
+- If unrelated work is already present, leave it uncommitted unless the user explicitly asks to include it.
+- Do not amend, reset, squash, or otherwise rewrite existing commits unless explicitly requested. Do not push to a remote unless requested.
+- Before ending the task, confirm your changes are committed and report the commit hashes and any remaining uncommitted work. If permissions or Git configuration prevent a commit, explain the blocker instead of claiming completion.
