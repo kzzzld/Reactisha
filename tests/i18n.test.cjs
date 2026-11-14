@@ -77,3 +77,9 @@ test('JSX display copy and accessibility strings use the translation catalog', (
   walk(path.join(__dirname, '../src'));
   assert.deepEqual(failures, [], `Move rendered text to src/i18n/languages.json:\n${failures.join('\n')}`);
 });
+
+
+test('device language defaults to Turkish for Turkish locales and English for unsupported locales', () => {
+  for (const locale of ['tr', 'tr-TR', 'tr-CY', 'TR-tr', 'tr_TR']) assert.equal(service.deviceLanguage(locale), 'tr');
+  for (const locale of ['en', 'en-TR', 'en-US', 'de-DE', 'ar', '', null, undefined]) assert.equal(service.deviceLanguage(locale), 'en');
+});

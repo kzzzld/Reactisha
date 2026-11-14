@@ -8,6 +8,9 @@ export const availableLanguages = (Object.keys(languages) as Language[]).map((co
 export function getLanguage(code: string): Language {
   return Object.prototype.hasOwnProperty.call(languages, code) ? code as Language : 'en';
 }
+export function deviceLanguage(languageTag?: string | null): Language {
+  return getLanguage(languageTag?.split(/[-_]/)[0].toLowerCase() ?? 'en');
+}
 export function createTranslator(code: string) {
   const language = getLanguage(code);
   const messages: Partial<Record<TranslationKey, string>> = languages[language].messages;
