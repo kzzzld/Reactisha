@@ -37,7 +37,7 @@
       "location.searchLabel": "Search cities",
       "location.searchPlaceholder": "Search city or country",
       "location.empty": "No matching cities. Try another city or country.",
-      "location.sample": "Sample locations and times for this preview.",
+      "location.sample": "Prayer times use the selected city centre.",
       "location.format": "{city}, {country}",
       "prayer.next": "{prayer} is next",
       "prayer.countdownLabel": "{countdown} until {prayer}",
@@ -47,7 +47,6 @@
       "prayer.todayTitle": "Today’s prayers",
       "prayer.today": "Today",
       "prayer.nextBadge": "Next",
-      "prayer.sample": "Sample prayer times · Preview only",
       "prayer.footer": "Your day, centred around prayer.",
       "ayah.subtitle": "A verse to read and reflect on.",
       "ayah.loading": "Loading an ayah…",
@@ -120,7 +119,11 @@
       "starter.animationsHint": "This template includes an animated component. The src/components/ui/collapsible.tsx component uses react-native-reanimated to animate opening this hint.",
       "ayah.translation.english": "English translation · M. M. Pickthall",
       "ayah.translation.turkish": "Turkish translation · Diyanet İşleri",
-      "tabs.timer": "Salat Timer"
+      "tabs.timer": "Salat Timer",
+      "prayer.loading": "Loading prayer times…",
+      "prayer.error": "Prayer times could not be loaded. Check your connection and try again.",
+      "prayer.retry": "Try again",
+      "prayer.source": "AlAdhan · {method} calculation. Local mosque times may differ."
     }
   },
   "tr": {
@@ -161,7 +164,7 @@
       "location.searchLabel": "Şehir ara",
       "location.searchPlaceholder": "Şehir veya ülke ara",
       "location.empty": "Eşleşen şehir bulunamadı. Başka bir şehir veya ülke deneyin.",
-      "location.sample": "Bu önizleme için örnek konumlar ve vakitler.",
+      "location.sample": "Namaz vakitleri seçilen şehir merkezine göre hesaplanır.",
       "location.format": "{city}, {country}",
       "prayer.next": "Sıradaki namaz: {prayer}",
       "prayer.countdownLabel": "{prayer} vaktine {countdown} kaldı",
@@ -171,7 +174,6 @@
       "prayer.todayTitle": "Bugünün namaz vakitleri",
       "prayer.today": "Bugün",
       "prayer.nextBadge": "Sıradaki",
-      "prayer.sample": "Örnek namaz vakitleri · Yalnızca önizleme",
       "prayer.footer": "Gününüzün merkezinde namaz.",
       "ayah.subtitle": "Okumak ve üzerinde düşünmek için bir ayet.",
       "ayah.loading": "Ayet yükleniyor…",
@@ -244,7 +246,11 @@
       "starter.animationsHint": "Bu şablon animasyonlu bir bileşen içerir. src/components/ui/collapsible.tsx bileşeni bu ipucunun açılışını canlandırmak için react-native-reanimated kullanır.",
       "ayah.translation.english": "İngilizce meal · M. M. Pickthall",
       "ayah.translation.turkish": "Türkçe meal · Diyanet İşleri",
-      "tabs.timer": "Namaz Sayacı"
+      "tabs.timer": "Namaz Sayacı",
+      "prayer.loading": "Namaz vakitleri yükleniyor…",
+      "prayer.error": "Namaz vakitleri yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.",
+      "prayer.retry": "Tekrar dene",
+      "prayer.source": "AlAdhan · {method} hesaplaması. Yerel cami vakitleri farklı olabilir."
     }
   }
 }

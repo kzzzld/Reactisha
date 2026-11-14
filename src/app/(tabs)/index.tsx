@@ -5,6 +5,7 @@ import { AppText as Text } from '@/components/app-text';
 import { useAppPreferences } from '@/context/app-preferences';
 import { type ColorScheme } from '@/data/color-schemes';
 import { prayerNames } from '@/data/prayer-times';
+import { cityDate, fetchPrayerTimes, type DailyPrayers } from '@/services/prayer-times';
 import { getPrayerState } from '@/utils/prayer-time';
 
 export default function SalatTimerScreen() {
@@ -16,7 +17,24 @@ export default function SalatTimerScreen() {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-  const prayer = getPrayerState(now, location);
+  const day = cityDate(now, location.timezone);
+  const [reload, setReload] = useState(0);
+  const [result, setResult] = useState<{ key: string; today: DailyPrayers; tomorrow: DailyPrayers } | null>(null);
+  const [errorKey, setErrorKey] = useState<string | null>(null);
+  const key = `${location.city}:${day}:${reload}`;
+  useEffect(() => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    let active = true;
+    Promise.all([fetchPrayerTimes(location, day, controller.signal), fetchPrayerTimes(location, cityDate(new Date(), location.timezone, 1), controller.signal)])
+      .then(([today, tomorrow]) => { if (active) setResult({ key, today, tomorrow }); })
+      .catch(() => { if (active) setErrorKey(key); })
+      .finally(() => clearTimeout(timeout));
+    return () => { active = false; clearTimeout(timeout); controller.abort(); };
+  }, [location, day, key, reload]);
+  const error = errorKey === key;
+  const data = result?.key === key ? result : null;
+  const prayer = data ? getPrayerState(now, data.today, data.tomorrow) : null;
   const date = new Intl.DateTimeFormat(locale, { timeZone: location.timezone, weekday: 'long', day: 'numeric', month: 'long' }).format(now);
   return (
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -24,10 +42,15 @@ export default function SalatTimerScreen() {
             <View style={styles.locationDot} />
             <Text style={styles.location}>{t('location.format', { city: t(location.cityKey), country: t(location.countryKey) })}</Text>
           </View>
+          {!prayer && <View style={styles.countdownSection}>
+            <Text accessibilityRole="alert" style={styles.reflection}>{t(error ? 'prayer.error' : 'prayer.loading')}</Text>
+            {error && <Text accessibilityRole="button" onPress={() => setReload((value) => value + 1)} style={styles.nextPrayer}>{t('prayer.retry')}</Text>}
+          </View>}
+          {prayer && data && <>
           <View style={styles.countdownSection}>
             <Text style={styles.nextPrayer}>{t('prayer.next', { prayer: t(`prayer.${prayer.nextName}`) })}</Text>
             <Text numberOfLines={1} adjustsFontSizeToFit accessibilityLabel={t('prayer.countdownLabel', { countdown: prayer.countdown, prayer: t(`prayer.${prayer.nextName}`) })} style={styles.countdown}>{prayer.countdown}</Text>
-            <Text style={styles.until}>{t(prayer.tomorrow ? 'prayer.untilTomorrow' : 'prayer.until', { time: location.times[prayer.nextIndex] })}</Text>
+            <Text style={styles.until}>{t(prayer.tomorrow ? 'prayer.untilTomorrow' : 'prayer.until', { time: prayer.nextTime })}</Text>
             <View style={styles.dividerDetail}><View style={styles.detailLine} /><View style={styles.detailDiamond} /><View style={styles.detailLine} /></View>
             <Text style={styles.reflection}>{t('prayer.reflection')}</Text>
           </View>
@@ -46,12 +69,13 @@ export default function SalatTimerScreen() {
                     <Text style={[styles.prayerName, passed && styles.pastText, next && styles.nextText]}>{t(`prayer.${name}`)}</Text>
                     {next && <Text style={styles.nextBadge}>{t('prayer.nextBadge')}</Text>}
                   </View>
-                  <Text style={[styles.prayerTime, passed && styles.pastText, next && styles.nextText]}>{location.times[index]}</Text>
+                  <Text style={[styles.prayerTime, passed && styles.pastText, next && styles.nextText]}>{data.today.times[index]}</Text>
                 </View>
               );
             })}
           </View>
-          <Text style={styles.sampleNote}>{t('prayer.sample')}</Text>
+          <Text style={styles.sampleNote}>{t('prayer.source', { method: data.today.method })}</Text>
+          </>}
           <Text style={styles.footer}>{t('prayer.footer')}</Text>
         </ScrollView>
   );
