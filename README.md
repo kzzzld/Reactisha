@@ -1,4 +1,4 @@
-# SalatTimer
+# Reactisha
 
 React Native app using Expo, TypeScript, and Expo Router. The starter supports Android, iOS, and web; native Windows and macOS apps require separate platform work.
 

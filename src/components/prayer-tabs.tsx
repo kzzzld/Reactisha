@@ -22,7 +22,7 @@ export function PrayerTabs() {
       <TabSlot style={{ flex: 1 }} />
       <TabList asChild>
         <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 20, paddingVertical: 10, borderTopWidth: 1, borderTopColor: colors.line, backgroundColor: colors.background }}>
-          <TabTrigger name="salat-timer" href="/" asChild><TabButton>{t('app.name')}</TabButton></TabTrigger>
+          <TabTrigger name="salat-timer" href="/" asChild><TabButton>{t('tabs.timer')}</TabButton></TabTrigger>
           <TabTrigger name="ayah" href="/ayah" asChild><TabButton>{t('tabs.ayah')}</TabButton></TabTrigger>
         </View>
       </TabList>

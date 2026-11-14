@@ -3,7 +3,7 @@
     "name": "English",
     "locale": "en-GB",
     "messages": {
-      "app.name": "Salat Timer",
+      "app.name": "Reactisha",
       "tabs.ayah": "Ayah",
       "common.done": "Done",
       "common.cancel": "Cancel",
@@ -119,14 +119,15 @@
       "starter.animations": "Animations",
       "starter.animationsHint": "This template includes an animated component. The src/components/ui/collapsible.tsx component uses react-native-reanimated to animate opening this hint.",
       "ayah.translation.english": "English translation · M. M. Pickthall",
-      "ayah.translation.turkish": "Turkish translation · Diyanet İşleri"
+      "ayah.translation.turkish": "Turkish translation · Diyanet İşleri",
+      "tabs.timer": "Salat Timer"
     }
   },
   "tr": {
     "name": "Türkçe",
     "locale": "tr-TR",
     "messages": {
-      "app.name": "Salat Timer",
+      "app.name": "Reactisha",
       "tabs.ayah": "Ayet",
       "common.done": "Tamam",
       "common.cancel": "İptal",
@@ -242,7 +243,8 @@
       "starter.animations": "Animasyonlar",
       "starter.animationsHint": "Bu şablon animasyonlu bir bileşen içerir. src/components/ui/collapsible.tsx bileşeni bu ipucunun açılışını canlandırmak için react-native-reanimated kullanır.",
       "ayah.translation.english": "İngilizce meal · M. M. Pickthall",
-      "ayah.translation.turkish": "Türkçe meal · Diyanet İşleri"
+      "ayah.translation.turkish": "Türkçe meal · Diyanet İşleri",
+      "tabs.timer": "Namaz Sayacı"
     }
   }
 }
