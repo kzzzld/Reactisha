@@ -28,7 +28,7 @@ Create a signed standalone APK using Expo-managed Android credentials:
 npx eas-cli@latest build --platform android --profile apk
 ```
 
-The linked Expo project is named **Reactisha**. Its existing project ID and legacy `SalatTimer` URL slug are retained to preserve signing credentials and build history: [Expo project](https://expo.dev/accounts/kzzzld/projects/SalatTimer).
+The linked Expo project is **[Reactisha](https://expo.dev/accounts/kzzzld/projects/Reactisha)** (slug `Reactisha`). It reuses the original Android signing key and package so future APKs can update existing installations. The former [SalatTimer project](https://expo.dev/accounts/kzzzld/projects/SalatTimer) remains available for historical builds, including v1.0.0.
 
 Signing keys and APK files are not stored in Git; APKs are attached to releases.
 

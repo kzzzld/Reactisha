@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Reactisha",
-    "slug": "SalatTimer",
+    "slug": "Reactisha",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -64,7 +64,7 @@
       },
       "supportsRTL": false,
       "eas": {
-        "projectId": "138ddad5-5d63-40f2-acb2-f33307908b54"
+        "projectId": "43a715f8-b749-45f3-a67d-09224d33ab5b"
       }
     },
     "owner": "kzzzld",
