@@ -8,15 +8,15 @@ import { fetchAyah, randomAyahNumber, type Ayah } from '@/services/ayah';
 
 type AyahState = { status: 'loading' } | { status: 'ready'; ayah: Ayah } | { status: 'error' };
 export default function AyahScreen() {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const { colors, cornerRadius, ayahSource } = useAppPreferences();
   const styles = useMemo(() => createStyles(colors, cornerRadius), [colors, cornerRadius]);
   const [request, setRequest] = useState(0);
-  const [result, setResult] = useState<{ source: string; request: number; state: AyahState } | null>(null);
+  const [result, setResult] = useState<{ source: string; language: string; request: number; state: AyahState } | null>(null);
   const previousNumber = useRef<number | undefined>(undefined);
   const pendingNumber = useRef<number | undefined>(undefined);
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
-  const state: AyahState = result?.source === ayahSource.id && result.request === request ? result.state : { status: 'loading' };
+  const state: AyahState = result?.source === ayahSource.id && result.language === language && result.request === request ? result.state : { status: 'loading' };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -24,16 +24,16 @@ export default function AyahScreen() {
     const number = pendingNumber.current ?? randomAyahNumber(previousNumber.current);
     pendingNumber.current = number;
     let active = true;
-    fetchAyah(ayahSource, number, controller.signal).then((ayah) => {
+    fetchAyah(ayahSource, number, controller.signal, language).then((ayah) => {
       if (controller.signal.aborted) return;
       previousNumber.current = number;
-      setResult({ source: ayahSource.id, request, state: { status: 'ready', ayah } });
+      setResult({ source: ayahSource.id, language, request, state: { status: 'ready', ayah } });
     }).catch(() => {
       // A cleanup abort must not replace a newer source/request with an error.
-      if (active) setResult({ source: ayahSource.id, request, state: { status: 'error' } });
+      if (active) setResult({ source: ayahSource.id, language, request, state: { status: 'error' } });
     }).finally(() => clearTimeout(timeout));
     return () => { active = false; clearTimeout(timeout); controller.abort(); };
-  }, [ayahSource, request]);
+  }, [ayahSource, language, request]);
 
   function loadAnother() {
     if (state.status === 'loading') return;
@@ -50,9 +50,9 @@ export default function AyahScreen() {
       {state.status === 'error' && <View style={styles.message}><Text accessibilityRole="alert" style={styles.error}>{t('ayah.error')}</Text><Text style={styles.hint}>{t('ayah.errorHint')}</Text></View>}
       {state.status === 'ready' && <View style={styles.verse}>
         <Text selectable style={styles.arabic}>{state.ayah.arabic}</Text>
-        <Text selectable style={styles.translation}>{state.ayah.english}</Text>
+        <Text selectable style={styles.translation}>{state.ayah.translation}</Text>
         <Text style={styles.reference}>{t('ayah.reference', { name: state.ayah.surahName ?? t('ayah.surah', { number: state.ayah.surah }), surah: state.ayah.surah, verse: state.ayah.verse })}</Text>
-        <Text style={styles.hint}>{t('ayah.translation')}</Text>
+        <Text style={styles.hint}>{t(state.ayah.attributionKey)}</Text>
       </View>}
       <Pressable accessibilityRole="button" accessibilityState={{ disabled: state.status === 'loading' }} disabled={state.status === 'loading'} onPress={loadAnother} style={({ pressed }) => [styles.button, (pressed || state.status === 'loading') && styles.dimmed]}>
         <Text style={styles.buttonText}>{t(state.status === 'error' ? 'common.retry' : 'ayah.another')}</Text>

@@ -18,7 +18,7 @@
       "menu.source": "Ayah source",
       "language.title": "Language",
       "language.hint": "Choose the language for the app’s interface.",
-      "language.ayahNote": "Ayah translations are provided by the selected source in English.",
+      "language.ayahNote": "Ayah translations follow your selected language: English (Pickthall) or Turkish (Diyanet).",
       "source.hint": "Ayahs are fetched from your selected source. An internet connection is required.",
       "rounding.title": "Corner rounding",
       "rounding.summary": "Corner rounding · {radius}",
@@ -53,7 +53,6 @@
       "ayah.loading": "Loading an ayah…",
       "ayah.error": "Couldn’t load this ayah.",
       "ayah.errorHint": "Check your connection and retry, or choose another Ayah source in the three-dot menu.",
-      "ayah.translation": "English translation · M. M. Pickthall",
       "ayah.another": "Another ayah",
       "ayah.source": "Source: {source}",
       "ayah.surah": "Surah {number}",
@@ -118,7 +117,9 @@
       "starter.themes": "Light and dark mode components",
       "starter.themesHint": "This template supports light and dark modes. The useColorScheme() hook lets you inspect the current color scheme and adjust UI colors accordingly.",
       "starter.animations": "Animations",
-      "starter.animationsHint": "This template includes an animated component. The src/components/ui/collapsible.tsx component uses react-native-reanimated to animate opening this hint."
+      "starter.animationsHint": "This template includes an animated component. The src/components/ui/collapsible.tsx component uses react-native-reanimated to animate opening this hint.",
+      "ayah.translation.english": "English translation · M. M. Pickthall",
+      "ayah.translation.turkish": "Turkish translation · Diyanet İşleri"
     }
   },
   "tr": {
@@ -140,7 +141,7 @@
       "menu.source": "Ayet kaynağı",
       "language.title": "Dil",
       "language.hint": "Uygulama arayüzünün dilini seçin.",
-      "language.ayahNote": "Ayet mealleri seçilen kaynak tarafından İngilizce olarak sunulur.",
+      "language.ayahNote": "Ayet mealleri seçtiğiniz dile göre gösterilir: Türkçe (Diyanet) veya İngilizce (Pickthall).",
       "source.hint": "Ayetler seçtiğiniz kaynaktan alınır. İnternet bağlantısı gereklidir.",
       "rounding.title": "Köşe yuvarlaklığı",
       "rounding.summary": "Köşe yuvarlaklığı · {radius}",
@@ -175,7 +176,6 @@
       "ayah.loading": "Ayet yükleniyor…",
       "ayah.error": "Bu ayet yüklenemedi.",
       "ayah.errorHint": "Bağlantınızı kontrol edip tekrar deneyin veya üç noktalı menüden başka bir ayet kaynağı seçin.",
-      "ayah.translation": "İngilizce meal · M. M. Pickthall",
       "ayah.another": "Başka bir ayet",
       "ayah.source": "Kaynak: {source}",
       "ayah.surah": "Sure {number}",
@@ -211,9 +211,9 @@
       "themes.amoled.name": "AMOLED",
       "themes.amoled.description": "Saf siyah ve nane yeşili vurgu",
       "sources.alquranCloud.name": "Al Quran Cloud",
-      "sources.alquranCloud.description": "Osmanî Arapça · Pickthall İngilizce",
+      "sources.alquranCloud.description": "Osmanî Arapça · Diyanet Türkçe",
       "sources.quranCdn.name": "Quran API · jsDelivr",
-      "sources.quranCdn.description": "Osmanî Hafs Arapça · Pickthall İngilizce",
+      "sources.quranCdn.description": "Osmanî Hafs Arapça · Diyanet Türkçe",
       "cities.istanbul": "İstanbul",
       "countries.turkiye": "Türkiye",
       "cities.ankara": "Ankara",
@@ -240,7 +240,9 @@
       "starter.themes": "Açık ve koyu mod bileşenleri",
       "starter.themesHint": "Bu şablon açık ve koyu modları destekler. useColorScheme() kancası geçerli renk temasını inceleyerek arayüz renklerini buna göre ayarlamanızı sağlar.",
       "starter.animations": "Animasyonlar",
-      "starter.animationsHint": "Bu şablon animasyonlu bir bileşen içerir. src/components/ui/collapsible.tsx bileşeni bu ipucunun açılışını canlandırmak için react-native-reanimated kullanır."
+      "starter.animationsHint": "Bu şablon animasyonlu bir bileşen içerir. src/components/ui/collapsible.tsx bileşeni bu ipucunun açılışını canlandırmak için react-native-reanimated kullanır.",
+      "ayah.translation.english": "İngilizce meal · M. M. Pickthall",
+      "ayah.translation.turkish": "Türkçe meal · Diyanet İşleri"
     }
   }
 }

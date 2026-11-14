@@ -12,8 +12,8 @@ const code = ts.transpileModule(fs.readFileSync(path.join(__dirname, '../src/ser
 const service = {};
 new Function('exports', code)(service);
 
-function cloudPayload() {
-  return { code: 200, data: ['quran-uthmani', 'en.pickthall'].map((identifier) => ({
+function cloudPayload(edition = 'en.pickthall') {
+  return { code: 200, data: ['quran-uthmani', edition].map((identifier) => ({
     edition: { identifier }, number: 1, numberInSurah: 1,
     surah: { number: 1, englishName: 'Al-Faatiha' }, text: 'Fixture text',
   })) };
@@ -88,5 +88,48 @@ test('network requests use only the chosen provider and pass cancellation signal
     assert.ok(requests.every((url) => url.startsWith('https://cdn.jsdelivr.net/')));
     global.fetch = async () => ({ ok: false, status: 503 });
     await assert.rejects(service.fetchAyah(service.ayahSources[0], 1, controller.signal), /503/);
+  } finally { global.fetch = original; }
+});
+
+
+test('Turkish cloud translations retain the source text and Diyanet attribution', () => {
+  const payload = cloudPayload('tr.diyanet');
+  payload.data[1].text = 'Türkçe test metni';
+  const ayah = service.parseCloudAyah(payload, 1, 'tr');
+  assert.equal(ayah.translation, 'Türkçe test metni');
+  assert.equal(ayah.language, 'tr');
+  assert.equal(ayah.attributionKey, 'ayah.translation.turkish');
+  assert.throws(() => service.parseCloudAyah(cloudPayload(), 1, 'tr'));
+  assert.throws(() => service.parseCloudAyah(payload, 1, 'en'));
+});
+
+test('both providers select language-specific editions without silently falling back', async () => {
+  const original = global.fetch;
+  const requests = [];
+  const controller = new AbortController();
+  global.fetch = async (url) => {
+    requests.push(url);
+    return { ok: true, json: async () => url.includes('alquran.cloud')
+      ? cloudPayload(url.includes('tr.diyanet') ? 'tr.diyanet' : 'en.pickthall')
+      : { chapter: 1, verse: 1, text: 'Fixture text' } };
+  };
+  try {
+    for (const language of ['en', 'tr']) {
+      for (const source of service.ayahSources) {
+        requests.length = 0;
+        const ayah = await service.fetchAyah(source, 1, controller.signal, language);
+        assert.equal(ayah.language, language);
+        assert.equal(ayah.attributionKey, language === 'tr' ? 'ayah.translation.turkish' : 'ayah.translation.english');
+        const edition = source.id === 'alquran-cloud'
+          ? (language === 'tr' ? 'tr.diyanet' : 'en.pickthall')
+          : (language === 'tr' ? 'tur-diyanetisleri' : 'eng-mohammedmarmadu');
+        assert.ok(requests.some((url) => url.includes(edition)));
+      }
+    }
+    global.fetch = async (url) => { requests.push(url); return { ok: false, status: 503 }; };
+    requests.length = 0;
+    await assert.rejects(service.fetchAyah(service.ayahSources[0], 1, controller.signal, 'tr'));
+    assert.equal(requests.length, 1);
+    assert.ok(requests[0].includes('tr.diyanet'));
   } finally { global.fetch = original; }
 });
